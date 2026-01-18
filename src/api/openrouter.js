@@ -2,8 +2,8 @@
  * OpenRouter API integration for Vite/React
  */
 
-const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const MODEL = import.meta.env.VITE_MODEL || "openai/gpt-oss-120b:free";
+const API_KEY = "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";
+const MODEL = "openai/gpt-oss-120b:free";
 const BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
