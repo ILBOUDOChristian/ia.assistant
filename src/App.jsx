@@ -12,9 +12,7 @@ import {
     Target,
     Palette
 } from 'lucide-react';
-
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const MODEL = import.meta.env.VITE_MODEL;
+import { chatCompletion } from './api/openrouter';
 
 function App() {
     const [prompt, setPrompt] = useState('');
@@ -29,36 +27,22 @@ function App() {
         setResult('');
 
         try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "https://ilboudochristian.github.io/brandbrain-ai",
-                    "X-Title": "BrandBrain AI Christian"
+            const messages = [
+                {
+                    "role": "system",
+                    "content": "Tu es l'expert marketing de JOFÉ Digital. Rédige du contenu PRO, humain et prêt à l'emploi. INTERDICTION : N'utilise jamais de symboles de mise en forme Markdown comme les étoiles (**) ou les dièses (#) dans le texte. Utilise des sauts de ligne clairs."
                 },
-                body: JSON.stringify({
-                    "model": MODEL,
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "Tu es l'expert marketing de JOFÉ Digital. Rédige du contenu PRO, humain et prêt à l'emploi. INTERDICTION : N'utilise jamais de symboles de mise en forme Markdown comme les étoiles (**) ou les dièses (#) dans le texte. Utilise des sauts de ligne clairs."
-                        },
-                        {
-                            "role": "user",
-                            "content": `Stratégie pour: "${prompt}". Canal: ${platform}. Ton: ${tone}.`
-                        }
-                    ]
-                })
-            });
+                {
+                    "role": "user",
+                    "content": `Stratégie pour: "${prompt}". Canal: ${platform}. Ton: ${tone}.`
+                }
+            ];
 
-            const data = await response.json();
+            const data = await chatCompletion(messages);
+
             if (data.choices && data.choices[0]) {
-                // Nettoyage de sécurité au cas où l'IA en met quand même
                 const cleanText = data.choices[0].message.content.replace(/\*\*/g, '');
                 setResult(cleanText);
-            } else {
-                throw new Error(data.error?.message || "Erreur API");
             }
         } catch (error) {
             setResult(`⚠️ Erreur : ${error.message}`);
@@ -140,7 +124,7 @@ function App() {
             </div>
 
             <footer>
-                Powering  By Christian
+                Powering By ILBOUDO Christian
             </footer>
         </div>
     );
