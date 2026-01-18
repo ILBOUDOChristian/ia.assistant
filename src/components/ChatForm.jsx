@@ -9,14 +9,13 @@ import {
     FileText,
     Plus,
     Menu,
-    RefreshCw,
     User,
     Bot,
     Sparkles
 } from "lucide-react";
-import { chatCompletionStream } from "../api/openrouter"; // Version: 1.0.6 - Multimodal Fix (Gemini Flash)
+import { chatCompletionStream } from "../api/openrouter"; // Version: 1.0.7 - Overlay Integration
 
-export default function ChatForm() {
+export default function ChatForm({ onClose }) {
     const [chats, setChats] = useState(() => {
         const saved = localStorage.getItem("brandbrain_chats_v3");
         return saved ? JSON.parse(saved) : [{ id: "1", title: "Nouvelle Discussion", messages: [] }];
@@ -27,6 +26,7 @@ export default function ChatForm() {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [streamingContent, setStreamingContent] = useState("");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({ show: false, title: "", content: null });
     const chatEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -39,6 +39,27 @@ export default function ChatForm() {
     }, [chats]);
 
     const handleFileChange = (e) => {
+        setModalConfig({
+            show: true,
+            title: "Information",
+            content: (
+                <div className="modal-info-list">
+                    <p>Ce modèle gratuit ne peut pas analyser de fichiers (images/PDF).</p>
+                    <div className="modal-features">
+                        <div className="feat-item"> Générer des images</div>
+                        <div className="feat-item"> Rédiger du contenu marketing</div>
+                        <div className="feat-item"> Conseils stratégiques</div>
+                    </div>
+                </div>
+            )
+        });
+
+        // Réinitialiser l'input
+        e.target.value = "";
+        return;
+
+        // Code original (désactivé tant que GPT-OSS-120B est utilisé)
+        /*
         const files = Array.from(e.target.files);
         files.forEach(file => {
             const reader = new FileReader();
@@ -52,6 +73,7 @@ export default function ChatForm() {
             };
             reader.readAsDataURL(file);
         });
+        */
     };
 
     const copyToClipboard = (text) => {
@@ -173,6 +195,19 @@ export default function ChatForm() {
 
     return (
         <div className={`chat-wrapper ${sidebarOpen ? 'sidebar-open' : ''}`}>
+            {modalConfig.show && (
+                <div className="info-modal-overlay" onClick={() => setModalConfig({ ...modalConfig, show: false })}>
+                    <div className="info-modal" onClick={e => e.stopPropagation()}>
+                        <div className="info-modal-header">
+                            <span>{modalConfig.title}</span>
+                            <button onClick={() => setModalConfig({ ...modalConfig, show: false })}><X size={18} /></button>
+                        </div>
+                        <div className="info-modal-body">
+                            {modalConfig.content}
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Sidebar Overlay (Mobile) */}
             <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
 
@@ -197,7 +232,7 @@ export default function ChatForm() {
                     ))}
                 </div>
                 <div className="sidebar-footer">
-                    ILBOUDO Christian 2026
+                    © 2026 BrandBrain
                 </div>
             </aside>
 
@@ -210,9 +245,13 @@ export default function ChatForm() {
                         <Brain className="logo" size={24} />
                         <h1>BrandBrain</h1>
                     </div>
-                    <button className="refresh-btn" onClick={() => window.location.reload()} title="Actualiser">
-                        <RefreshCw size={18} />
-                    </button>
+                    <div className="header-actions">
+                        {onClose && (
+                            <button className="close-app-btn" onClick={onClose} title="Fermer">
+                                <X size={20} />
+                            </button>
+                        )}
+                    </div>
                 </header>
 
                 {/* Chat Feed */}

@@ -3,14 +3,14 @@
  * 🔐 Security: Key is obfuscated.
  * 🌊 Support for Streaming & Multimodality.
  * 🚀 Model: Gemini 2.0 Flash (Fast & Multimodal)
- * Deploy: 2026-01-18-09-05
+ * Deploy: 2026-01-18-14-18
  */
 
 const _k = "c2stb3ItdjEtNjQ1MTI5NjgyYzNmMzY3MTg3NWMzZGRiNjNiMmRlNTA1MmQxOTYzOTg3MzIzMjBkMzFkYTBhMDc2N2U3ODE4Nw==";
 const API_KEY = atob(_k);
 
-// Restoring Gemini 2.0 Flash for Multimodal (Vision/PDF) support
-const MODEL = "google/gemini-2.0-flash-exp:free";
+// Switching to GPT-OSS-120B (text-only, fast)
+const MODEL = "openai/gpt-oss-120b:free";
 const BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
