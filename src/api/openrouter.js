@@ -2,9 +2,10 @@
  * OpenRouter API integration for Vite/React
  */
 
-const API_KEY = "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";
+const API_KEY = "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";
 const MODEL = "openai/gpt-oss-120b:free";
 const BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
+// Updated: 2026-01-18 - New API Key deployed
 
 /**
  * Sends a message to the OpenRouter API.
