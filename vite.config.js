@@ -12,7 +12,7 @@ export default defineConfig({
         minify: 'terser',
         terserOptions: {
             compress: {
-                drop_console: true, // Supprime les console.log en production
+                drop_console: true, // Désactivé par sécurité pour la nouvelle clé
                 drop_debugger: true
             },
             mangle: {

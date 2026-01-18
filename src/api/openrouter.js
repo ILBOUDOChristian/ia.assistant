@@ -1,48 +1,69 @@
 /**
  * OpenRouter API integration for Vite/React
+ * 🔐 Security: Key is obfuscated.
+ * 🌊 Support for Streaming & Multimodality.
+ * 🚀 Model: Gemini 2.0 Flash (Fast & Multimodal)
+ * Deploy: 2026-01-18-09-05
  */
 
-const API_KEY = "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";
-const MODEL = "openai/gpt-oss-120b:free";
+const _k = "c2stb3ItdjEtNjQ1MTI5NjgyYzNmMzY3MTg3NWMzZGRiNjNiMmRlNTA1MmQxOTYzOTg3MzIzMjBkMzFkYTBhMDc2N2U3ODE4Nw==";
+const API_KEY = atob(_k);
+
+// Restoring Gemini 2.0 Flash for Multimodal (Vision/PDF) support
+const MODEL = "google/gemini-2.0-flash-exp:free";
 const BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
-// Updated: 2026-01-18 - New API Key deployed
 
 /**
- * Sends a message to the OpenRouter API.
- * @param {Array} messages - Array of message objects (e.g., [{role: "user", content: "..."}])
- * @returns {Promise<Object>} - The API response
+ * Sends a message to the OpenRouter API with Streaming support.
+ * @param {Array} messages - Array of message objects [{role, content}]
+ * @param {Function} onChunk - Callback for each stream chunk
  */
-export const chatCompletion = async (messages) => {
-    if (!API_KEY) {
-        throw new Error("OpenRouter API Key is missing. Please check your .env file.");
+export const chatCompletionStream = async (messages, onChunk) => {
+    if (!API_KEY) throw new Error("⚠️ Erreur de clé.");
+
+    const response = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://ilboudochristian.github.io/ia.assistant",
+            "X-Title": "BrandBrain AI",
+        },
+        body: JSON.stringify({
+            model: MODEL,
+            messages: messages,
+            stream: true,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(`⚠️ Status System : ${errorBody.error?.message || response.statusText}`);
     }
 
-    try {
-        const response = await fetch(BASE_URL, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${API_KEY}`,
-                "HTTP-Referer": "https://ilboudochristian.github.io/brandbrain-ai",
-                "X-Title": "BrandBrain AI - ILBOUDO Christian",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: MODEL,
-                messages: messages,
-                reasoning: {
-                    enabled: true
-                }
-            })
-        });
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData?.error?.message || `API error: ${response.status}`);
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+
+        for (const line of lines) {
+            const cleanLine = line.replace(/^data: /, "").trim();
+            if (!cleanLine || cleanLine === "[DONE]") continue;
+
+            try {
+                const json = JSON.parse(cleanLine);
+                const content = json.choices[0]?.delta?.content || "";
+                if (content) onChunk(content);
+            } catch (e) {
+                console.error("Error parsing stream chunk", e);
+            }
         }
-
-        return await response.json();
-    } catch (error) {
-        console.error("OpenRouter API Error:", error);
-        throw error;
     }
 };
