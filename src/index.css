@@ -595,14 +595,15 @@ textarea {
     align-items: center;
     position: relative;
     width: 100%;
-    gap: 4rem;
-    /* Defines space between Brand and Desktop Group */
+    gap: 2rem;
+    /* Reduced space between Brand and Desktop Group */
 }
 
 .nav-desktop-group {
     display: flex;
     align-items: center;
     flex: 1;
+    gap: 2rem;
     /* Occupy all remaining space */
 }
 
@@ -1182,7 +1183,7 @@ textarea {
     .modal-content-app {
         width: 100% !important;
         max-width: 100% !important;
-        height: 100dvh !important;
+        height: 85dvh !important;
         /* Dynamic Viewport Height for keyboard */
         max-height: none !important;
         border-radius: 20px 20px 0 0 !important;
