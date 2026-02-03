@@ -6,15 +6,8 @@ import './index.css';
 function App() {
     const [isChatOpen, setIsChatOpen] = useState(false);
 
-    // Bloquer le scroll derrière la modale
-    React.useEffect(() => {
-        if (isChatOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => { document.body.style.overflow = 'unset'; };
-    }, [isChatOpen]);
+    // Scroll lock removed for floating widget
+
 
     return (
         <div className="app-main-wrapper">

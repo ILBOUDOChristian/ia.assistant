@@ -213,6 +213,12 @@ export default function ChatForm({ onClose }) {
 
             {/* Sidebar History */}
             <aside className="chat-sidebar">
+                <div className="sidebar-header-mobile">
+                    <span>Menu</span>
+                    <button onClick={() => setSidebarOpen(false)} className="sidebar-close-btn">
+                        <X size={20} />
+                    </button>
+                </div>
                 <button onClick={startNewChat} className="sidebar-new-btn">
                     <Plus size={16} /> Nouvelle discussion
                 </button>
